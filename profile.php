@@ -59,6 +59,235 @@ try {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="style.css">
 </head>
+<style>
+    /* Profile Page Styles */
+.profile-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #2c2c2c;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 15px;
+}
+
+.profile-header h2 {
+    color: #e0e0e0;
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.profile-header .links {
+    display: flex;
+    gap: 15px;
+}
+
+.profile-header .links a {
+    padding: 8px 15px;
+    background-color: #4db6e2;
+    color: #1a1a1a;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.profile-header .links a:hover {
+    background-color: #3a9ccf;
+    transform: translateY(-2px);
+}
+
+.section-title {
+    font-size: 20px;
+    color: #e0e0e0;
+    margin: 25px 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+}
+
+/* Stats Container */
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #3a3a3a;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #4db6e2;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #aaa;
+}
+
+/* Records Grid */
+.records-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.record-card {
+    background-color: #3a3a3a;
+    padding: 20px;
+    border-radius: 5px;
+    border-left: 5px solid #4db6e2;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.record-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.record-type {
+    font-size: 16px;
+    color: #e0e0e0;
+    margin-bottom: 8px;
+}
+
+.record-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #4db6e2;
+    margin-bottom: 10px;
+}
+
+.record-detail {
+    font-size: 14px;
+    color: #aaa;
+    margin-top: 5px;
+}
+
+.record-date {
+    font-size: 12px;
+    color: #aaa;
+}
+
+/* Game History Table */
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.ranking-table th, 
+.ranking-table td {
+    padding: 12px 15px;
+    text-align: center;
+}
+
+.ranking-table th {
+    background-color: #4db6e2;
+    color: #1a1a1a;
+    font-weight: bold;
+}
+
+.ranking-table tr:nth-child(even) {
+    background-color: #363636;
+}
+
+.ranking-table tr:nth-child(odd) {
+    background-color: #2a2a2a;
+}
+
+.ranking-table tr:hover {
+    background-color: #444;
+}
+
+/* Empty state message */
+.no-data {
+    text-align: center;
+    padding: 30px;
+    color: #aaa;
+    font-style: italic;
+    background-color: #3a3a3a;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+/* Back button */
+.back-btn {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 12px 20px;
+    background-color: #4db6e2;
+    color: #1a1a1a;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.2s;
+    font-weight: bold;
+}
+
+.back-btn:hover {
+    background-color: #3a9ccf;
+    transform: translateY(-2px);
+}
+
+/* Error message */
+.error-message {
+    background-color: #382a2a;
+    color: #d9534f;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    text-align: center;
+    border: 1px solid #6e3e3e;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .profile-header .links {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .records-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .ranking-table th, 
+    .ranking-table td {
+        padding: 10px 8px;
+        font-size: 0.9rem;
+    }
+}
+</style>
 <body>
     <div class="profile-container">
         <div class="profile-header">

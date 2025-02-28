@@ -10,6 +10,18 @@
     <div class="container">
         <h1>Test de Vitesse de Frappe</h1>
 
+        <div class="user-menu">
+            <?php if (is_logged_in()): ?>
+                <div class="welcome-message">Bienvenue, <?php echo htmlspecialchars($_SESSION['username']); ?> !</div>
+                <a href="profile.php" class="btn profile-btn">Mon Profil</a>
+                <a href="logout.php" class="btn logout-btn">Déconnexion</a>
+            <?php else: ?>
+                <div class="welcome-message">Connectez-vous pour sauvegarder vos résultats</div>
+                <a href="login.php" class="btn login-btn">Connexion</a>
+                <a href="register.php" class="btn register-btn">Inscription</a>
+            <?php endif; ?>
+        </div>
+
         <div class="language-selector">
             <button id="fr-btn" class="language-btn active">Français</button>
             <button id="en-btn" class="language-btn">English</button>

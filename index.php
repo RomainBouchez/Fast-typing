@@ -56,6 +56,51 @@ require_once "database.php";
             display: flex;
             align-items: center;
         }
+
+        .welcome-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: rgba(42, 42, 42, 0.9);
+            color: #e0e0e0;
+            border-radius: 5px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: fadeInOut 5s forwards;
+            display: flex;
+            align-items: center;
+        }
+        
+        .welcome-popup .user-icon {
+            margin-right: 10px;
+            font-size: 18px;
+            color: #4db6e2;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        .user-menu {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        }
+        
+        .user-menu .btn {
+            padding: 8px 15px;
+            margin-left: 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
         
         /* Styles pour les notifications */
         .save-success-message,
@@ -161,18 +206,25 @@ require_once "database.php";
     </style>
 </head>
 <body class="<?php echo is_logged_in() ? 'logged-in' : ''; ?>">
+
+    <?php if (is_logged_in()): ?>
+    <div class="welcome-popup">
+        <span class="user-icon">👤</span>
+        <span>Bienvenue, <?php echo htmlspecialchars($_SESSION['username']); ?> !</span>
+    </div>
+    <?php endif; ?>
+
     <div class="container">
         <h1>Test de Vitesse de Frappe</h1>
         
         <div class="user-menu">
-            <!-- Ajout du bouton de classement -->
-            <a href="leaderboard.php" class="btn leaderboard-btn">🏆 Classement</a>
-            
             <?php if (is_logged_in()): ?>
-                <div class="welcome-message">Bienvenue, <?php echo htmlspecialchars($_SESSION['username']); ?> !</div>
+                <!-- Enlever le message de bienvenue du menu -->
                 <a href="profile.php" class="btn profile-btn">Mon Profil</a>
+                <a href="leaderboard.php" class="btn leaderboard-btn">Classement</a>
                 <a href="logout.php" class="btn logout-btn">Déconnexion</a>
             <?php else: ?>
+                <a href="leaderboard.php" class="btn leaderboard-btn">Classement</a>
                 <a href="login.php" class="btn login-btn">Connexion</a>
                 <a href="register.php" class="btn register-btn">Inscription</a>
             <?php endif; ?>
