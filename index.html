@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Vitesse de Frappe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Test de Vitesse de Frappe</h1>
+
+        <div class="language-selector">
+            <button id="fr-btn" class="language-btn active">Français</button>
+            <button id="en-btn" class="language-btn">English</button>
+        </div>
+        
+        <div class="timer">
+            <div id="minutes">1</div>
+            <span>:</span>
+            <div id="seconds">00</div>
+        </div>
+        
+        <div class="test-container">
+            <div id="text-display" class="text-display">
+                <!-- Le texte à taper apparaîtra ici -->
+            </div>
+            
+            <textarea id="input-field" class="input-field" placeholder="Commencez à taper quand vous êtes prêt..."></textarea>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat">
+                <div class="stat-value" id="wpm">0</div>
+                <div class="stat-label">WPM</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="accuracy">0</div>
+                <div class="stat-label">Précision</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="errors">0</div>
+                <div class="stat-label">Erreurs</div>
+            </div>
+        </div>
+        
+        <button id="restart-btn">Recommencer</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

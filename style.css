@@ -1,0 +1,283 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.timer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.test-container {
+    margin-bottom: 20px;
+}
+
+.text-display {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px 5px 0 0;
+    font-size: 18px;
+    height: 120px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    line-height: 1.5;
+}
+
+.input-field {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    border: 1px solid #ddd;
+    border-radius: 0 0 5px 5px;
+    resize: none;
+    height: 120px;
+    outline: none;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.stat {
+    text-align: center;
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 5px;
+    width: 30%;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #2980b9;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Styles pour les caractères corrects/incorrects (à utiliser avec JavaScript) */
+.correct {
+    color: #27ae60;
+}
+
+.incorrect {
+    color: #e74c3c;
+    text-decoration: underline;
+}
+
+.current {
+    background-color: #f1c40f;
+}
+
+/* Ajoutez ces styles à votre fichier style.css */
+.current-word {
+    background-color: #f1c40f;
+    border-radius: 3px;
+    padding: 2px;
+}
+
+.correct-word {
+    color: #27ae60;
+}
+
+.incorrect-word {
+    color: #e74c3c;
+    background-color: rgba(231, 76, 60, 0.2);
+    border-radius: 3px;
+    padding: 2px;
+}
+
+.loading {
+    color: #3498db;
+    font-style: italic;
+}
+
+.error {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.language-selector {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.language-btn {
+    padding: 8px 15px;
+    margin: 0 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.language-btn.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #2980b9;
+}
+
+.save-success-message,
+.save-error-message,
+.login-prompt {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    z-index: 1000;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease-out;
+}
+
+.save-success-message {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.save-error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.message-content {
+    display: flex;
+    align-items: center;
+}
+
+.message-content span {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.login-prompt {
+    background-color: white;
+    width: 400px;
+    padding: 20px;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.prompt-content h3 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.prompt-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.login-btn,
+.register-btn,
+.close-btn {
+    padding: 8px 15px;
+    margin: 0 5px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.login-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+}
+
+.register-btn {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+}
+
+.close-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.replay-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.replay-btn:hover {
+    background-color: #27ae60;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
