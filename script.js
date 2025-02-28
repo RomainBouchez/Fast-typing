@@ -14,7 +14,21 @@ const enBtn = document.getElementById('en-btn');
 const commonFrenchWords = [
     "le", "la", "un", "une", "et", "est", "en", "que", "qui", "dans", "pour", "sur", "avec", "pas", 
     "des", "ce", "se", "il", "elle", "sont", "au", "du", "mais", "ou", "car", "donc", "alors", "si", 
-    "tout", "plus", "moins", "aussi", "très", "bien", "mal", "bon", "bonne", "grand", "grande", "petit"
+    "tout", "plus", "moins", "aussi", "très", "bien", "mal", "bon", "bonne", "grand", "grande", "petit",
+    "jour", "monde", "vie", "temps", "main", "chose", "homme", "femme", "enfant", "pays", "ville", "rue",
+    "maison", "travail", "famille", "ami", "père", "mère", "fils", "fille", "chef", "idée", "corps", "tête",
+    "cœur", "eau", "terre", "air", "feu", "mer", "montagne", "arbre", "fleur", "animal", "chien", "chat",
+    "voiture", "train", "avion", "bateau", "route", "pont", "porte", "fenêtre", "table", "chaise", "lit",
+    "cuisine", "salon", "chambre", "salle", "jardin", "parc", "école", "travail", "bureau", "magasin",
+    "restaurant", "café", "hôtel", "hôpital", "médecin", "professeur", "étudiant", "livre", "journal",
+    "histoire", "film", "musique", "chanson", "danse", "sport", "jeu", "jouet", "argent", "prix", "nombre",
+    "couleur", "rouge", "bleu", "vert", "jaune", "noir", "blanc", "gris", "brun", "rose", "orange",
+    "chaud", "froid", "nouveau", "vieux", "jeune", "beau", "joli", "fort", "faible", "rapide", "lent",
+    "facile", "difficile", "simple", "complexe", "important", "utile", "possible", "impossible", "vrai", "faux",
+    "matin", "midi", "soir", "nuit", "aujourd'hui", "demain", "hier", "semaine", "mois", "année", "siècle",
+    "heure", "minute", "seconde", "janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août",
+    "septembre", "octobre", "novembre", "décembre", "lundi", "mardi", "mercredi", "jeudi", "vendredi",
+    "samedi", "dimanche", "nord", "sud", "est", "ouest", "haut", "bas", "gauche", "droite", "devant", "derrière"
 ];
 
 const commonEnglishWords = [
@@ -40,51 +54,80 @@ let currentLanguage = 'french'; // Langue par défaut
 // Fonction pour récupérer des mots aléatoires depuis l'API Datamuse
 async function fetchRandomWords(count = 30, language = 'fr') {
     try {
-        // Construire l'URL de l'API avec les paramètres appropriés selon la langue
         let apiUrl;
         
         if (language === 'fr') {
-            // Pour le français, on utilise le paramètre v=fr et on cherche des mots fréquents
-            apiUrl = 'https://api.datamuse.com/words?md=f&max=100&v=fr';
+            // API pour les mots français - Random Word Generator API
+            apiUrl = `https://random-word.ryanrk.com/api/fr/word/random?number=${count}`;
         } else {
-            // Pour l'anglais, on cherche des mots fréquents (sans le paramètre v=fr)
-            apiUrl = 'https://api.datamuse.com/words?md=f&max=100';
+            // API pour les mots anglais - Random Word API
+            apiUrl = `https://random-word-api.herokuapp.com/word?number=${count}`;
         }
         
-        console.log("Fetching words from API:", apiUrl);
-        const response = await fetch(apiUrl);
+        console.log(`Tentative de récupération de mots depuis: ${apiUrl}`);
+        
+        // Ajouter un timeout pour éviter d'attendre indéfiniment
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 secondes de timeout
+        
+        const response = await fetch(apiUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        // Vérifier si la réponse est OK
+        if (!response.ok) {
+            console.warn(`Réponse API non valide (${response.status}), utilisation de la liste de secours`);
+            return useFallbackWordList(count, language);
+        }
+        
         const data = await response.json();
-        console.log("API response:", data);
+        console.log("Réponse de l'API:", data);
         
-        if (!data || data.length === 0) {
-            console.warn("API returned empty data, using fallback list");
+        // Vérifier si les données reçues sont valides
+        if (!data || (Array.isArray(data) && data.length < count)) {
+            console.warn("Données insuffisantes depuis l'API, utilisation de la liste de secours");
             return useFallbackWordList(count, language);
         }
         
-        // Filtrer et trier les mots
-        const filteredWords = data
-            .filter(word => word.word && word.word.length > 1)
-            .map(word => word.word);
-        
-        if (filteredWords.length < count) {
-            console.warn("Not enough valid words from API, using fallback list");
+        let words;
+        // Traitement des données selon le format de l'API
+        if (Array.isArray(data)) {
+            // Si la réponse est déjà un tableau de mots
+            words = data.slice(0, count);
+        } else if (typeof data === 'object') {
+            // Si la réponse est un objet avec une propriété contenant les mots
+            // Adapter selon la structure réelle de la réponse
+            const possibleArrayProperties = Object.values(data).filter(Array.isArray);
+            if (possibleArrayProperties.length > 0) {
+                words = possibleArrayProperties[0].slice(0, count);
+            } else {
+                console.warn("Format de données inattendu, utilisation de la liste de secours");
+                return useFallbackWordList(count, language);
+            }
+        } else {
+            console.warn("Format de données inattendu, utilisation de la liste de secours");
             return useFallbackWordList(count, language);
         }
         
-        // Sélectionner un nombre aléatoire de mots
-        const selectedWords = [];
-        while (selectedWords.length < count) {
-            const randomIndex = Math.floor(Math.random() * filteredWords.length);
-            selectedWords.push(filteredWords[randomIndex]);
+        // Vérification finale et filtrage des mots non valides
+        words = words
+            .filter(word => word && typeof word === 'string' && word.length > 1)
+            .map(word => word.toLowerCase().trim());
+        
+        if (words.length < count) {
+            // Compléter avec des mots de secours si nécessaire
+            const fallbackWords = useFallbackWordList(count - words.length, language);
+            words = [...words, ...fallbackWords];
         }
         
-        return selectedWords;
+        // Log pour confirmer que nous utilisons bien les mots de l'API
+        console.log("Mots effectivement utilisés:", words);
+        return words;
+        
     } catch (error) {
-        console.error('Error fetching random words:', error);
+        console.error('Erreur lors de la récupération des mots:', error);
         return useFallbackWordList(count, language);
     }
 }
-
 // Fonction de secours qui utilise les listes locales en cas d'échec de l'API
 function useFallbackWordList(count, language) {
     console.log("Using fallback word list for language:", language);
@@ -101,16 +144,30 @@ function useFallbackWordList(count, language) {
 
 // Fonction pour initialiser le test
 async function initTest() {
-    console.log("Initializing test with language:", currentLanguage);
+    console.log("Initialisation du test avec la langue:", currentLanguage);
     
-    // Désactiver le champ de saisie pendant le chargement
     inputField.disabled = true;
     textDisplay.innerHTML = '<span class="loading">Chargement des mots...</span>';
     
     try {
-        // Récupérer des mots aléatoires depuis l'API
-        const words = await fetchRandomWords(30, currentLanguage === 'french' ? 'fr' : 'en');
-        console.log("Words loaded:", words);
+        // Récupérer des mots aléatoires
+        const lang = currentLanguage === 'french' ? 'fr' : 'en';
+        console.log(`Récupération de mots pour la langue: ${lang}`);
+        
+        const words = await fetchRandomWords(30, lang);
+        
+        // Vérification explicite que nous n'utilisons pas les listes par défaut
+        const frenchDefaultWords = commonFrenchWords.slice(0, 5).join(',');
+        const englishDefaultWords = commonEnglishWords.slice(0, 5).join(',');
+        const firstFiveWords = words.slice(0, 5).join(',');
+        
+        if ((lang === 'fr' && firstFiveWords === frenchDefaultWords) || 
+            (lang === 'en' && firstFiveWords === englishDefaultWords)) {
+            console.warn("⚠️ Utilisation des mots par défaut détectée!");
+        } else {
+            console.log("✓ Utilisation de mots aléatoires confirmée");
+        }
+        
         currentText = words.join(' ');
         
         // Afficher les mots
@@ -138,7 +195,7 @@ async function initTest() {
         // Focus sur le champ de saisie
         inputField.focus();
     } catch (error) {
-        console.error('Failed to initialize test:', error);
+        console.error('Échec de l\'initialisation du test:', error);
         textDisplay.innerHTML = '<span class="error">Erreur lors du chargement des mots. Veuillez réessayer.</span>';
         inputField.disabled = false;
     }

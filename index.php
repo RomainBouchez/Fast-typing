@@ -43,6 +43,12 @@ require_once "database.php";
             border: none;
         }
         
+        .leaderboard-btn {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+        }
+        
         .welcome-message {
             font-size: 14px;
             color: #7f8c8d;
@@ -159,6 +165,9 @@ require_once "database.php";
         <h1>Test de Vitesse de Frappe</h1>
         
         <div class="user-menu">
+            <!-- Ajout du bouton de classement -->
+            <a href="leaderboard.php" class="btn leaderboard-btn">🏆 Classement</a>
+            
             <?php if (is_logged_in()): ?>
                 <div class="welcome-message">Bienvenue, <?php echo htmlspecialchars($_SESSION['username']); ?> !</div>
                 <a href="profile.php" class="btn profile-btn">Mon Profil</a>
@@ -327,5 +336,3 @@ require_once "database.php";
             }
         };
     </script>
-</body>
-</html>

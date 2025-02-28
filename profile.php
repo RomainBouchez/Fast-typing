@@ -27,6 +27,13 @@ try {
     $stmt->execute();
     $records = $stmt->fetchAll();
     
+    // Récupérer le nombre de parties jouées
+    $sql = "SELECT COUNT(*) as games_count FROM game_history WHERE user_id = :user_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(":user_id", $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $games_count = $stmt->fetchColumn();
+    
     // Récupérer l'historique des 10 dernières parties
     $sql = "SELECT wpm, precision_score, errors, language, date_played 
             FROM game_history 
@@ -49,156 +56,15 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil - Test de Vitesse de Frappe</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .profile-container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .profile-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .profile-header h2 {
-            margin: 0;
-            color: #2c3e50;
-        }
-        
-        .profile-header .links a {
-            margin-left: 15px;
-            color: #3498db;
-            text-decoration: none;
-        }
-        
-        .stats-container {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 30px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-        }
-        
-        .stat-box {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #2980b9;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: #7f8c8d;
-        }
-        
-        .section-title {
-            font-size: 20px;
-            color: #2c3e50;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 5px;
-        }
-        
-        .records-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .record-card {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 5px solid #3498db;
-        }
-        
-        .record-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2980b9;
-        }
-        
-        .record-type {
-            font-size: 16px;
-            color: #34495e;
-            margin-bottom: 5px;
-        }
-        
-        .record-date {
-            font-size: 12px;
-            color: #7f8c8d;
-        }
-        
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        
-        .history-table th, .history-table td {
-            padding: 12px 15px;
-            text-align: center;
-        }
-        
-        .history-table th {
-            background-color: #3498db;
-            color: white;
-            font-weight: normal;
-        }
-        
-        .history-table tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        
-        .history-table tr:hover {
-            background-color: #e0f0ff;
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-            font-style: italic;
-        }
-        
-        .back-to-game {
-            display: block;
-            width: 200px;
-            margin: 20px auto;
-            padding: 10px 15px;
-            background-color: #3498db;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        
-        .back-to-game:hover {
-            background-color: #2980b9;
-        }
-    </style>
 </head>
 <body>
     <div class="profile-container">
         <div class="profile-header">
             <h2>Profil de <?php echo htmlspecialchars($username); ?></h2>
             <div class="links">
+                <a href="leaderboard.php">Classement</a>
                 <a href="index.php">Retour au jeu</a>
                 <a href="logout.php">Déconnexion</a>
             </div>
@@ -210,15 +76,15 @@ try {
             
             <h3 class="section-title">Statistiques générales</h3>
             <div class="stats-container">
-                <div class="stat-box">
+                <div class="stat">
                     <div class="stat-value"><?php echo $user_stats['total_games']; ?></div>
                     <div class="stat-label">Parties jouées</div>
                 </div>
-                <div class="stat-box">
+                <div class="stat">
                     <div class="stat-value"><?php echo number_format($user_stats['avg_precision'], 2); ?>%</div>
                     <div class="stat-label">Précision moyenne</div>
                 </div>
-                <div class="stat-box">
+                <div class="stat">
                     <div class="stat-value"><?php echo round($user_stats['avg_errors']); ?></div>
                     <div class="stat-label">Erreurs moyennes</div>
                 </div>
@@ -246,9 +112,18 @@ try {
                                     $record_name = 'Meilleur WPM en anglais';
                                     $record_value = $record['record_value'] . ' WPM';
                                     break;
-                                case 'best_precision':
-                                    $record_name = 'Meilleure précision';
-                                    $record_value = number_format($record['record_value'], 2) . '%';
+                                case 'weighted_precision':
+                                    $record_name = 'Score de Précision Élite';
+                                    // Calculer la précision réelle à partir du score pondéré
+                                    $confidence_factor = 1 - (1 / sqrt(min(100, $games_count)));
+                                    if ($confidence_factor > 0) {
+                                        $real_precision = ($record['record_value'] / $confidence_factor);
+                                        $record_value = number_format($record['record_value'], 2) . ' pts';
+                                        $record_value .= '<div class="record-detail">(' . number_format($real_precision, 2) . 
+                                            '% sur ' . $games_count . ' parties)</div>';
+                                    } else {
+                                        $record_value = number_format($record['record_value'], 2) . ' pts';
+                                    }
                                     break;
                                 default:
                                     $record_name = $record['record_type'];
@@ -271,7 +146,7 @@ try {
             
             <h3 class="section-title">Historique des 10 dernières parties</h3>
             <?php if (count($history) > 0): ?>
-                <table class="history-table">
+                <table class="ranking-table">
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -304,7 +179,26 @@ try {
             
         <?php endif; ?>
         
-        <a href="index.php" class="back-to-game">Retour au jeu</a>
+        <a href="index.php" class="back-btn">Retour au jeu</a>
     </div>
+    
+    <script>
+        // Script pour ajouter des effets visuels aux cartes de records
+        document.addEventListener('DOMContentLoaded', function() {
+            const recordCards = document.querySelectorAll('.record-card');
+            
+            recordCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.1)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+                });
+            });
+        });
+    </script>
 </body>
 </html>

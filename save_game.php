@@ -92,22 +92,44 @@ try {
     }
     
     // Record de précision
-    $sql = "SELECT record_value FROM user_records 
-            WHERE user_id = :user_id AND record_type = 'best_precision'";
+    // Récupérer le nombre total de parties du joueur (après l'ajout de la partie actuelle)
+    $sql = "SELECT COUNT(*) as total_games FROM game_history WHERE user_id = :user_id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(":user_id", $user_id, PDO::PARAM_INT);
     $stmt->execute();
-    $current_precision = $stmt->fetchColumn();
-    
-    if ($precision > $current_precision) {
+    $total_games = max(1, $stmt->fetchColumn()); // Au moins 1 partie
+
+    // Calculer la précision moyenne
+    $sql = "SELECT AVG(precision_score) as avg_precision FROM game_history WHERE user_id = :user_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(":user_id", $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $avg_precision = $stmt->fetchColumn();
+
+    // Formule de pondération : (Précision moyenne × (1 - 1/√nombre_parties))
+    // Cette formule donne plus de poids à la précision à mesure que le nombre de parties augmente
+    // Elle pénalise les joueurs avec peu de parties tout en récompensant ceux avec beaucoup de parties
+    $confidence_factor = 1 - (1 / sqrt(min(100, $total_games))); // Limité à 100 parties pour le facteur
+    $weighted_precision = $avg_precision * $confidence_factor;
+
+    // Récupérer le record de précision pondérée actuel
+    $sql = "SELECT record_value FROM user_records 
+            WHERE user_id = :user_id AND record_type = 'weighted_precision'";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(":user_id", $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $current_weighted_precision = $stmt->fetchColumn();
+
+    // Mettre à jour si meilleur record
+    if ($weighted_precision > $current_weighted_precision) {
         $sql = "UPDATE user_records 
-                SET record_value = :precision, date_achieved = NOW() 
-                WHERE user_id = :user_id AND record_type = 'best_precision'";
+                SET record_value = :weighted_precision, date_achieved = NOW() 
+                WHERE user_id = :user_id AND record_type = 'weighted_precision'";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(":user_id", $user_id, PDO::PARAM_INT);
-        $stmt->bindParam(":precision", $precision, PDO::PARAM_STR);
+        $stmt->bindParam(":weighted_precision", $weighted_precision, PDO::PARAM_STR);
         $stmt->execute();
-        error_log("Updated precision record to $precision");
+        error_log("Updated weighted precision record to $weighted_precision");
     }
     
     // 3. Mettre à jour les statistiques moyennes de l'utilisateur
